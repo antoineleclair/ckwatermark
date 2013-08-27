@@ -16,11 +16,11 @@
     }
 
     function _onFocus(e) {
-        var $textArea = $('#' + $(this.element.$).attr('id'));
+        var id = $(this.element.$).attr('id');
+        var $textArea = $('#' + id);
         var val = $textArea.val().replace(/\s/g, '');
         var watermark = $textArea.data('ckwatermark').replace(/\s/g, '');
         if (val == watermark) {
-            var id = $(this.element.$).attr('id');
             setTimeout(function() {
                 CKEDITOR.instances[id]
                     .document
