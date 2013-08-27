@@ -1,8 +1,6 @@
-// For use with the CKEDITOR only
-// based off script found here....
-// https://github.com/antoineleclair/ckwatermark/blob/master/jquery.ckwatermark.js
+// https://github.com/antoineleclair/ckwatermark
 
-(function ($) {
+(function($) {
 
     function _onBlur(e) {
         var $textArea = $(this.element.$);
@@ -22,20 +20,26 @@
         var val = $textArea.val().replace(/\s/g, '');
         var watermark = $textArea.data('ckwatermark').replace(/\s/g, '');
         if (val == watermark) {
-            // this is an ugly hack as otherwise you lose focus
-            setTimeout('CKEDITOR.instances[\'' + $(this.element.$).attr('id') + '\'].document.getBody().setHtml(\'<p></p>\')', 0);
+            var id = $(this.element.$).attr('id');
+            setTimeout(function() {
+                CKEDITOR.instances[id]
+                    .document
+                    .getBody()
+                    .setHtml('<p></p>');
+            }, 0);
         }
     }
 
-    $.fn.ckwatermark = function (text) {
-        return this.each(function (i, el) {
+    $.fn.ckwatermark = function(text) {
+        return this.each(function(i, el) {
             $(this).addClass('ckwatermark');
             $(this).data('ckwatermark', text);
-            $(this).closest('form').submit(function () {
-                $(this).find('textarea.ckwatermark').each(function () {
+            $(this).closest('form').submit(function() {
+                $(this).find('textarea.ckwatermark').each(function() {
                     var editor = CKEDITOR.instances[$(this).attr('id')];
                     var val = editor.getData().replace(/\s/g, '');
-                    var watermark = $(this).data('ckwatermark').replace(/\s/g, '');
+                    var watermark = $(this).data('ckwatermark')
+                        .replace(/\s/g, '');
                     if (val == watermark) {
                         $(this).val('');
                         editor.document.getBody().setHtml('');
