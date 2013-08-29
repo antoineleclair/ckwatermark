@@ -1,5 +1,4 @@
 // https://github.com/antoineleclair/ckwatermark
-
 (function ($) {
 
     function _onBlur(e) {
@@ -14,8 +13,10 @@
             } else {
                 e.editor.setData($textArea.data('ckwatermark'));
             }
+            e.editor.updateElement();
+            e.editor.resetDirty();
         }
-        e.editor.updateElement();
+        
     }
 
     function _onFocus(e) {
@@ -35,6 +36,7 @@
                     CKEDITOR.instances[id]
                         .setData('');
                 }
+                CKEDITOR.instances[id].resetDirty();
             }, 0);
 
         }
@@ -58,6 +60,7 @@
                             editor.setData('');
                         }
                         editor.updateElement();
+                        editor.resetDirty();
                     }
                 });
             });
