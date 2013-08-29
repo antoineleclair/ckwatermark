@@ -1,18 +1,21 @@
 // https://github.com/antoineleclair/ckwatermark
 
-(function($) {
+(function ($) {
 
     function _onBlur(e) {
+        e.editor.updateElement();
         var $textArea = $(this.element.$);
         var val = $textArea.val();
-        if (val == $textArea.data('ckwatermark')) {
-            e.editor.document.getBody().setHtml($textArea.data('ckwatermark'));
-        } else {
-            val.replace(/\s/g, '');
-            if (val == '' || val == '<p></p>') {
-                $textArea.val($textArea.data('ckwatermark'));
+        val.replace(/\s/g, '');
+        if (val == '' || val == '<p></p>') {
+            $textArea.val($textArea.data('ckwatermark'));
+            if (e.editor.document) {
+                e.editor.document.getBody().setHtml($textArea.data('ckwatermark'));
+            } else {
+                e.editor.setData($textArea.data('ckwatermark'));
             }
         }
+        e.editor.updateElement();
     }
 
     function _onFocus(e) {
@@ -20,29 +23,40 @@
         var $textArea = $('#' + id);
         var val = $textArea.val().replace(/\s/g, '');
         var watermark = $textArea.data('ckwatermark').replace(/\s/g, '');
-        if (val == watermark) {
-            setTimeout(function() {
-                CKEDITOR.instances[id]
-                    .document
-                    .getBody()
-                    .setHtml('<p></p>');
+        var editorval = e.editor.getData().replace(/\s/g, '');
+        if (val == watermark || editorval == watermark) {
+            setTimeout(function () {
+                if (CKEDITOR.instances[id].document) {
+                    CKEDITOR.instances[id]
+                        .document
+                        .getBody()
+                        .setHtml('<p></p>');
+                } else {
+                    CKEDITOR.instances[id]
+                        .setData('');
+                }
             }, 0);
+
         }
     }
 
-    $.fn.ckwatermark = function(text) {
-        return this.each(function(i, el) {
+    $.fn.ckwatermark = function (text) {
+        return this.each(function (i, el) {
             $(this).addClass('ckwatermark');
             $(this).data('ckwatermark', text);
-            $(this).closest('form').submit(function() {
-                $(this).find('textarea.ckwatermark').each(function() {
+            $(this).closest('form').submit(function () {
+                $(this).find('textarea.ckwatermark').each(function () {
                     var editor = CKEDITOR.instances[$(this).attr('id')];
                     var val = editor.getData().replace(/\s/g, '');
                     var watermark = $(this).data('ckwatermark')
                         .replace(/\s/g, '');
-                    if (val == watermark) {
+                    if (val == watermark || val == '<p></p>') {
                         $(this).val('');
-                        editor.document.getBody().setHtml('');
+                        if (editor.document) {
+                            editor.document.getBody().setHtml('');
+                        } else {
+                            editor.setData('');
+                        }
                         editor.updateElement();
                     }
                 });
